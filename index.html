@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#082f49"><title>Pool temperature</title><style>
-*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;background:radial-gradient(ellipse at top,#155e75,#082f49 65%);color:#ecfeff;font-family:system-ui,sans-serif;padding:24px}main{text-align:center;width:min(100%,540px)}h1{font-size:18px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#a5f3fc}#temperature{font-size:clamp(72px,20vw,128px);font-weight:650;letter-spacing:-.07em;margin:20px 0}#status{display:inline-block;border-radius:99px;padding:8px 16px;background:#ffffff15}p{color:#a5c7d5;font-size:14px;line-height:1.6}a{color:inherit}</style></head>
-<body><main><h1>Pool temperature</h1><div id="temperature" aria-live="polite">—</div><img src="pool.gif" alt="Dog floating in a swimming pool" style="display:block;width:220px;max-width:75%;height:auto;margin:0 auto 24px;border-radius:16px"><div id="status" role="status">Connecting…</div><p id="updated">Waiting for the first reading</p><p>Updates approximately every 10 minutes</p></main><script>
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;background:radial-gradient(ellipse at top,#155e75,#082f49 65%);color:#ecfeff;font-family:system-ui,sans-serif;padding:24px}main{text-align:center;width:min(100%,900px)}h1{font-size:18px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#a5f3fc}#temperature{font-size:clamp(72px,20vw,128px);font-weight:650;letter-spacing:-.07em;margin:20px 0}#status{display:inline-block;border-radius:99px;padding:8px 16px;background:#ffffff15}p{color:#a5c7d5;font-size:14px;line-height:1.6}a{color:inherit}</style></head>
+<body><main><h1>Pool temperature</h1><div id="temperature" aria-live="polite">—</div><img src="pool.gif" alt="Dog floating in a swimming pool" style="display:block;width:220px;max-width:75%;height:auto;margin:0 auto 24px;border-radius:16px"><div id="status" role="status">Connecting…</div><p id="updated">Waiting for the first reading</p><p>Updates approximately every 10 minutes</p><section style="margin-top:36px;text-align:left"><h2 style="font-size:18px;font-weight:500">Temperature &amp; blanket · last 48 hours <span id="history-unit">°C</span></h2><div id="history">Waiting for history</div><p style="text-align:center">🟩 Covered &nbsp; 🟧 Uncovered &nbsp; <span style="color:#29b6f6">━ Temperature</span></p><p style="text-align:center">History builds from installation. Blank areas indicate missing or unknown data. Blanket changes are sampled every 10 minutes.</p></section></main><script src="graph.js"></script><script>
 let last=null;
 const temp=document.getElementById('temperature'),status=document.getElementById('status'),updated=document.getElementById('updated');
-function render(failed=false){
+function render(failed=false){ if(last) drawHistory(last);
  if(!last){temp.textContent='—';status.textContent=failed?'Waiting for data':'Waiting for first reading';return}
  const date=new Date(last.updated_at), age=Date.now()-date.getTime();
  const valid=typeof last.temperature==='number'&&Number.isFinite(last.temperature)&&Number.isFinite(date.getTime())&&age>=-300000;
@@ -16,4 +16,5 @@ function render(failed=false){
 async function refresh(){try{const r=await fetch('https://raw.githubusercontent.com/9dcb7zk84d-cell/pool/main/data.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);last=await r.json();render()}catch(e){render(true)}}
 refresh();setInterval(refresh,60000);
 </script></body></html>
+
 
