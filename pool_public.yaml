@@ -1,0 +1,28 @@
+# Copy to /config/packages/pool_public.yaml.
+# If packages aren't enabled, merge these sections into configuration.yaml.
+shell_command:
+  publish_pool_temperature: >-
+    python3 /config/pool_publish.py
+    "{{ states('sensor.pool_display_temperature') | float(default='unavailable') }}"
+    "{{ 'F' if state_attr('sensor.pool_display_temperature', 'unit_of_measurement') == '°F' else 'C' }}"
+
+automation:
+  - id: publish_public_pool_temperature
+    alias: Publish public pool temperature
+    mode: single
+    triggers:
+      - trigger: time_pattern
+        minutes: "/10"
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: shell_command.publish_pool_temperature
+        response_variable: result
+      - if: "{{ result.returncode != 0 }}"
+        then:
+          - action: persistent_notification.create
+            data:
+              notification_id: pool_public_publish_error
+              title: Pool website update failed
+              message: "Check the GitHub token, connectivity and Home Assistant logs."
+
